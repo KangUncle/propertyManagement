@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProHouseCarMapper">
+
+    <resultMap type="ProHouseCar" id="ProHouseCarResult">
+        <result property="id"    column="id"    />
+        <result property="houseId"    column="house_id"    />
+        <result property="carNum"    column="car_num"    />
+        <result property="carAttributeId"    column="car_attribute_id"    />
+        <result property="image"    column="image"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <association property="carAttribute" column="car_attribute_id" javaType="ProStopCarAttribute" resultMap="ProStopCarAttributeResult"/>
+    </resultMap>
+
+    <resultMap type="ProStopCarAttribute" id="ProStopCarAttributeResult">
+        <result property="id"    column="attribute_id"    />
+        <result property="title"    column="title"    />
+        <result property="basisPrice"    column="basis_price"    />
+        <result property="timOutPrice"    column="tim_out_price"    />
+        <result property="freeTime"    column="free_time"    />
+        <result property="note"    column="note"    />
+        <result property="createTime"    column="attribute_create_time"    />
+        <result property="creater"    column="attribute_creater"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updator"    column="updator"    />
+    </resultMap>
+
+    <resultMap type="ProHouse" id="ProHouseResult">
+        <result property="id"    column="id"    />
+        <result property="owerName"    column="ower_name"    />
+        <result property="owerMobile"    column="ower_mobile"    />
+        <result property="houseTypeId"    column="house_type_id"    />
+        <result property="houseAddressId"    column="house_address_id"    />
+        <result property="houseAddressName"    column="house_address_name"    />
+        <result property="buyTime"    column="buy_time"    />
+        <result property="createrTime"    column="creater_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="houseState"    column="house_state"    />
+        <result property="owerImage"    column="ower_image"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectProHouseCarVo">
+        select id, house_id, car_num, car_attribute_id, image, create_time, create_by from pro_house_car
+    </sql>
+
+    <select id="selectProHouseCarList" parameterType="ProHouseCar" resultMap="ProHouseCarResult">
+        select hc.*,sca.*
+        from pro_house_car hc
+        left join pro_stop_car_attribute sca on hc.car_attribute_id=sca.id
+        left join pro_house h on hc.house_id=h.id
+        left join pro_house_address ha on ha.id=h.house_address_id
+        <where>
+            <if test="carNum != null  and carNum != ''"> and car_num = #{carNum}</if>
+            <if test="carAttributeId != null "> and car_attribute_id = #{carAttributeId}</if>
+            <if test="houseId!=null">and ha.ancestors like concat('%',#{houseId},'%')</if>
+        </where>
+    </select>
+
+    <select id="selectProHouseCarById" parameterType="Long" resultMap="ProHouseCarResult">
+        <include refid="selectProHouseCarVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProHouseCar" parameterType="ProHouseCar" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_house_car
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="houseId != null">house_id,</if>
+            <if test="carNum != null">car_num,</if>
+            <if test="carAttributeId != null">car_attribute_id,</if>
+            <if test="image != null">image,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="houseId != null">#{houseId},</if>
+            <if test="carNum != null">#{carNum},</if>
+            <if test="carAttributeId != null">#{carAttributeId},</if>
+            <if test="image != null">#{image},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProHouseCar" parameterType="ProHouseCar">
+        update pro_house_car
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="houseId != null">house_id = #{houseId},</if>
+            <if test="carNum != null">car_num = #{carNum},</if>
+            <if test="carAttributeId != null">car_attribute_id = #{carAttributeId},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProHouseCarById" parameterType="Long">
+        delete from pro_house_car where id = #{id}
+    </delete>
+
+    <delete id="deleteProHouseCarByIds" parameterType="String">
+        delete from pro_house_car where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="selectCarListByCommunityId" parameterType="Long" resultMap="ProHouseCarResult">
+        select c.* from pro_house_car c
+        LEFT JOIN  pro_house h ON h.id=c.house_id
+        LEFT JOIN pro_house_address a ON a.id=h.house_address_id
+        <where>
+            1=1
+            <if test="_parameter!=null">
+                and a.ancestors like concat('%',#{communityId},'%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增物业订单')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-houseOrder-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">开始时间：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="startTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">结束时间：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="endTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">房屋地址：</label>
+            <div class="col-sm-8">
+                <select name="houseAddressId" class="form-control m-b" required>
+                    <option value="">所有</option>
+                    <option th:each="address:${addressList}" th:id="${address.id}" th:value="${address.id}" th:text="${address.name}"/>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<script th:inline="javascript">
+    var prefix = ctx + "property/houseOrder"
+    $("#form-houseOrder-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/initializeTheOrder", $('#form-houseOrder-add').serialize());
+        }
+    }
+
+    $("input[name='startTime']").datetimepicker({
+        format: "yyyy-mm",
+        minView: "month",
+        autoclose: true
+    });
+
+    $("input[name='endTime']").datetimepicker({
+        format: "yyyy-mm",
+        minView: "month",
+        autoclose: true
+    });
+
+</script>
+</body>
+</html>

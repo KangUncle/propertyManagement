@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增车位出租详情')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: bootstrap-select-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-carRentInfo-add">
+        <label class="col-sm-3 control-label" is-required >小区：</label>
+        <div class="col-sm-8" >
+            <select name="communityId" class="form-control m-b" >
+                <option th:each="community:${communityList}"th:text="${community.name}" th:value="${community.id}" >所有</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">车位编号：</label>
+            <div class="col-sm-8" >
+                <select id="carportNum" name="carportNum" class="form-control m-b" onclick="selectCarportListByCommunityName()">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">车牌号：</label>
+            <div class="col-sm-8" >
+                <select id="houseCarNum" name="houseCarNum" class="form-control m-b" onclick="selectCarListByCommunityId()">
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">家庭地址：</label>
+            <div class="col-sm-8">
+                <input onclick="selectAddressTree()" id="treeName" type="text"  placeholder="请选择归属地址" class="form-control" required>
+                <input name="houseAddressId" id="treeId" type="hidden">
+                <input name="houseAddress" id="houseId" type="hidden">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">成员姓名：</label>
+            <div class="col-sm-8">
+                <select name="memberName" class="form-control m-b">
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">开始时间：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="startTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">结束时间：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="endTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">租聘状态：</label>
+            <div class="col-sm-8">
+                <select name="state" class="form-control m-b" th:with="type=${@dict.getType('rent_car_state')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<th:block th:include="include :: bootstrap-select-js" />
+<script th:inline="javascript">
+    var prefix = ctx + "property/carRentInfo"
+    $("#form-carRentInfo-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-carRentInfo-add').serialize());
+        }
+    }
+
+    $("input[name='startTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+    $("input[name='endTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+    //动态刷新数据
+    $("select[name='communityId']").change(function () {
+        selectCarportListByCommunityName();
+        selectCarListByCommunityId();
+    })
+
+    //根据小区的名称查询所属小区正在出租的车位）
+    function selectCarportListByCommunityName() {
+        $("select[name='carportNum']").empty();
+        var url=ctx+"property/carCarport/list";
+        var data={
+            communityId:$("select[name='communityId']").val(),
+            state:3
+        }
+        $.post(url,data,function (e) {
+            if (e.rows.length==0) alert("小区没有车位。请先新建");
+            for (var i=0;i<e.rows.length;i++){
+                var id=e.rows[i].id
+                var carportNum=e.rows[i].carportNum
+                $("select[name='carportNum']").append('<option value="'+id+'">'+carportNum+'</option>' )
+            }
+            $("#carportNum").selectpicker('refresh');
+            $("#carportNum").selectpicker('render');
+        })
+
+    }
+    //  根据小区的名称查询所属小区的车辆
+    function selectCarListByCommunityId() {
+        $("select[name='houseCarNum']").empty();
+        var url=ctx+"property/carIntoTreasury/list"
+        var data={
+            houseId:$("select[name='communityId']").val()
+        }
+        $.post(url,data,function (e) {
+            if (e.rows.length==0) alert("该小区暂无入库车辆、请添加");
+            for (var i=0;i<e.rows.length;i++){
+                var id=e.rows[i].id
+                var carNum=e.rows[i].carNum
+                $("select[name='houseCarNum']").append('<option value="'+id+'">'+carNum+'</option>' )
+            }
+            $("select[name='houseCarNum']").selectpicker('refresh');
+            $("select[name='houseCarNum']").selectpicker('render');
+        })
+
+    }
+    /*选择地址树*/
+    function selectAddressTree() {
+        var treeId = $("#treeId").val();
+        var addressId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+        var url = ctx + "property/houseaddress/selectHouseaddressTree/" + addressId;
+        var options = {
+            title: '选择地址',
+            width: "380",
+            url: url,
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+    function doSubmit(index, layero){
+        var tree = layero.find("iframe")[0].contentWindow.$._tree;
+        if ($.tree.notAllowRoot(tree)) {
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+        var  houseAddressId=$('input[name="houseAddressId"]').val()
+        getHouseId(houseAddressId);
+    }
+
+    //根据房屋地址id,得到房屋id
+    function getHouseId(id){
+        var url=ctx+"property/house/conditionsTheQuery"
+        var data={
+            houseAddressId:id
+        }
+        console.log(id)
+        $.post(url,data,function (e) {
+            if (e.code!=200){
+                var houseId=e.id
+                $("input[name='houseAddress']").val(houseId)
+                getHouseMemberList(houseId)
+            }else {
+                alert("该房屋不存在或则其他问题请联系管理员。")
+            }
+        })
+    }
+    //获取该家庭下的成员
+    function getHouseMemberList(id){
+        //避免重复注入
+        $('select[name="memberName"]').empty()
+        var url=ctx+"property/houseMember/list";
+        var data={
+            houseId:id
+        }
+        $.post(url,data,function (e) {
+            if (e.length!=0){
+                var memberList=e.rows
+                $("option").data("memberList",memberList)
+                for (var i=0;i<memberList.length;i++){
+                    var id=memberList[i].id
+                    var name=memberList[i].name
+                    $('select[name="memberName"]').append('<option value="'+id+'" >'+name+'</option>')
+                }
+                $('select[name="memberName"]').selectpicker('refresh');
+                $('select[name="memberName"]').selectpicker('render');
+            }else {
+                alert("该家庭暂时没有成员!请先添加。")
+            }
+        })
+    }
+
+
+</script>
+</body>
+</html>

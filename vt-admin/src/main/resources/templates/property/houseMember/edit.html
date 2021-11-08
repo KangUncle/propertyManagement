@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改家庭成员')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-houseMember-edit" th:object="${proHouseMember}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">成员姓名：</label>
+            <div class="col-sm-8">
+                <input name="name" th:field="*{name}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">年龄：</label>
+            <div class="col-sm-8">
+                <input name="age" th:field="*{age}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">性别：</label>
+            <div class="col-sm-8">
+                <select name="sex" class="form-control m-b" th:with="type=${@dict.getType('sys_user_sex')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{sex}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">联系方式：</label>
+            <div class="col-sm-8">
+                <input name="mobile" th:field="*{mobile}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <select name="state" class="form-control m-b" th:with="type=${@dict.getType('pro_member_state')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{state}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注：</label>
+            <div class="col-sm-8">
+                <input name="note" th:field="*{note}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">门禁编号：</label>
+            <div class="col-sm-8">
+                <input name="entranceGuardNum" th:field="*{entranceGuardNum}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">微信的openid：</label>
+            <div class="col-sm-8">
+                <input name="openId" th:field="*{openId}" class="form-control" type="text">
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<script th:inline="javascript">
+    var prefix = ctx + "property/houseMember";
+    $("#form-houseMember-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-houseMember-edit').serialize());
+        }
+    }
+</script>
+</body>
+</html>ml>

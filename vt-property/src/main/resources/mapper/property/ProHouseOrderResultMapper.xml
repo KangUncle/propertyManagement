@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProHouseOrderMapper">
+
+    <resultMap type="ProHouseOrder" id="ProHouseOrderResult">
+        <result property="id"    column="id"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="realPrice"    column="real_price"    />
+        <result property="discount"    column="discount"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="houseAddressId"    column="house_address_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="shelfStatus"    column="shelf_status"    />
+        <result property="houseId"    column="house_id"    />
+        <result property="reviewStatus"    column="review_status"    />
+        <result property="reviewTime"    column="review_time"    />
+        <result property="reviewMan"    column="review_man"    />
+        <result property="note"    column="note"    />
+        <association property="address" column="house_address_id" javaType="ProHouseAddress" resultMap="ProHouseAddressResult"/>
+        <association property="type" column="house_type_id" javaType="ProHouseType" resultMap="ProHouseTypeResult"/>
+        <association property="house" column="house_id" javaType="ProHouse" resultMap="ProHouseResult"/>
+    </resultMap>
+
+    <resultMap type="ProHouse" id="ProHouseResult">
+        <result property="id"    column="house_id"    />
+        <result property="owerName"    column="ower_name"    />
+        <result property="owerMobile"    column="ower_mobile"    />
+        <result property="houseTypeId"    column="house_house_type_id"    />
+        <result property="houseAddressId"    column="house_house_address_id"    />
+        <result property="owerImage"    column="ower_image"    />
+        <result property="buyTime"    column="buy_time"    />
+        <result property="createrTime"    column="house_creater_time"    />
+        <result property="createBy"    column="house_create_by"    />
+        <result property="updateTime"    column="house_update_time"    />
+        <result property="updateBy"    column="house_update_by"    />
+        <result property="houseState"    column="house_state"    />
+        <result property="remark"    column="house_remark"    />
+    </resultMap>
+
+
+    <resultMap id="ProHouseAddressResult" type="ProHouseAddress">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="pid"    column="pid"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="ancestorsName"    column="ancestors_name"    />
+    </resultMap>
+
+    <resultMap id="ProHouseTypeResult" type="ProHouseType">
+        <result property="id"    column="type_id"    />
+        <result property="name"    column="type_name"    />
+        <result property="area"    column="area"    />
+        <result property="note"    column="type_note"    />
+        <result property="createTime"    column="type_create_time"    />
+        <result property="unitPrice"    column="unit_price"    />
+    </resultMap>
+    <sql id="selectProHouseOrderVo">
+        SELECT
+        o.*,
+        h.*,
+        t.id type_id, t.name type_name,t.area,t.note type_note,t.unit_price,t.create_time type_create_time,
+        address.*
+        FROM pro_house_order o
+        LEFT JOIN pro_house h ON o.house_id=h.id
+        LEFT JOIN pro_house_type t ON t.id=h.house_type_id
+        LEFT JOIN pro_house_address address ON address.id=h.house_address_id
+    </sql>
+
+    <select id="selectProHouseOrderList" parameterType="ProHouseOrder" resultMap="ProHouseOrderResult">
+        <include refid="selectProHouseOrderVo"/>
+        <where>
+            <if test="params.beginStartTime != null and params.beginStartTime!= ''">
+                and date_format(start_time,'%y%m%d')&gt;= date_format(#{params.beginStarTime},'%y%m%d')
+             </if>
+            <if test="params.endStartTime != null and params.endStartTime!= ''">
+                and date_format(start_time,'%y%m%d')&lt;= date_format(#{params.endStarTime},'%y%m%d')
+            </if>
+            <if test="houseAddressId != null "> and address.ancestors like concat('%', #{houseAddressId}, '%') or address.id=#{houseAddressId}</if>
+            <if test="shelfStatus != null "> and shelf_status = #{shelfStatus}</if>
+            <if test="reviewStatus != null "> and review_status = #{reviewStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectProHouseOrderById" parameterType="Long" resultMap="ProHouseOrderResult">
+        <include refid="selectProHouseOrderVo"/>
+        where o.id = #{id}
+    </select>
+
+    <insert id="insertProHouseOrder" parameterType="ProHouseOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_house_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="realPrice != null">real_price,</if>
+            <if test="discount != null">discount,</if>
+            <if test="totalPrice != null">total_price,</if>
+            <if test="houseAddressId != null">house_address_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="shelfStatus != null">shelf_status,</if>
+            <if test="houseId != null">house_id,</if>
+            <if test="reviewStatus != null">review_status,</if>
+            <if test="reviewTime != null">review_time,</if>
+            <if test="reviewMan != null">review_man,</if>
+            <if test="note != null">note,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="realPrice != null">#{realPrice},</if>
+            <if test="discount != null">#{discount},</if>
+            <if test="totalPrice != null">#{totalPrice},</if>
+            <if test="houseAddressId != null">#{houseAddressId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="shelfStatus != null">#{shelfStatus},</if>
+            <if test="houseId != null">#{houseId},</if>
+            <if test="reviewStatus != null">#{reviewStatus},</if>
+            <if test="reviewTime != null">#{reviewTime},</if>
+            <if test="reviewMan != null">#{reviewMan},</if>
+            <if test="note != null">#{note},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProHouseOrder" parameterType="ProHouseOrder">
+        update pro_house_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="realPrice != null">real_price = #{realPrice},</if>
+            <if test="discount != null">discount = #{discount},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="houseAddressId != null">house_address_id = #{houseAddressId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="shelfStatus != null">shelf_status = #{shelfStatus},</if>
+            <if test="houseId != null">house_id = #{houseId},</if>
+            <if test="reviewStatus != null">review_status = #{reviewStatus},</if>
+            <if test="reviewTime != null">review_time = #{reviewTime},</if>
+            <if test="reviewMan != null">review_man = #{reviewMan},</if>
+            <if test="note != null">note = #{note},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProHouseOrderById" parameterType="Long">
+        delete from pro_house_order where id = #{id}
+    </delete>
+
+    <delete id="deleteProHouseOrderByIds" parameterType="String">
+        delete from pro_house_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="insertProHouseOrderByList" >
+        insert  into pro_house_order
+        (id, start_time, end_time, real_price, discount, total_price, house_address_id, create_by, create_time, shelf_status, house_id, review_status, review_time, review_man, note)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.id},#{item.startTime},#{item.endTime},#{item.realPrice},#{item.discount},#{item.totalPrice},#{item.houseAddressId},#{item.createBy},#{item.createTime},#{item.shelfStatus},#{item.houseId},#{item.reviewStatus},#{item.reviewTime},#{item.reviewMan},#{item.note})
+        </foreach>
+
+    </insert>
+
+</mapper>

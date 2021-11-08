@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增房屋基础信息')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-house-add">
+        <h4 class="form-header h4">房屋基础信息</h4>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">业主姓名：</label>
+            <div class="col-sm-8">
+                <input name="owerName" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">业主联系电话：</label>
+            <div class="col-sm-8">
+                <input name="owerMobile" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">房屋类型：</label>
+            <div class="col-sm-8">
+                <select name="houseTypeId" class="form-control m-b">
+                    <option th:each="type:${typeList}" th:value="${type.id}" th:text="${type.name}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">房屋地址：</label>
+            <div class="col-sm-8">
+                <input onclick="selectAddressTree()" id="treeName" type="text" placeholder="请选择归属地址" class="form-control" required>
+                <input name="houseAddressId" id="treeId" type="hidden" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">房屋购买时间：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="buyTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <div class="radio-box" th:each="dict : ${@dict.getType('pro_house_state')}">
+                    <input type="radio" th:id="${'houseState_' + dict.dictCode}" name="houseState" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                    <label th:for="${'houseState_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">业主照片：</label>
+            <div class="col-sm-8">
+                <input type="hidden" name="owerImage">
+                <div class="file-loading">
+                    <input class="form-control file-upload" id="owerImage" name="file" type="file">
+                </div>
+            </div>
+        </div>
+        <h4 class="form-header h4">其他信息</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">备注：</label>
+                    <div class="col-xs-10">
+                        <textarea name="remark" maxlength="500" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 class="form-header h4">家庭成员信息</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-white btn-sm" onclick="addColumn()"><i class="fa fa-plus"> 增加</i></button>
+                <button type="button" class="btn btn-white btn-sm" onclick="sub.delColumn()"><i class="fa fa-minus"> 删除</i></button>
+                <div class="col-sm-12 select-table table-striped">
+                    <table id="bootstrap-table"></table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "property/house"
+    var sexDatas = [[${@dict.getType('sys_user_sex')}]];
+    var stateDatas = [[${@dict.getType('pro_member_state')}]];
+    $("#form-house-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-house-add').serialize());
+        }
+    }
+
+    $("input[name='buyTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+
+    $(".file-upload").fileinput({
+        uploadUrl: '/common/upload',
+        maxFileCount: 1,
+        autoReplace: true
+    }).on('fileuploaded', function (event, data, previewId, index) {
+        console.log(data)
+        $("input[name='" + event.currentTarget.id + "']").val(data.response.url)
+    }).on('fileremoved', function (event, id, index) {
+        $("input[name='" + event.currentTarget.id + "']").val('')
+    })
+
+    $(function() {
+        var options = {
+            pagination: false,
+            showSearch: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'index',
+                    align: 'center',
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                        var columnIndex = $.common.sprintf("<input type='hidden' name='index' value='%s'>", $.table.serialNumber(index));
+                        return columnIndex + $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field: 'name',
+                    align: 'center',
+                    title: '成员姓名',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='proHouseMemberList[%s].name' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+                {
+                    field: 'age',
+                    align: 'center',
+                    title: '年龄',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='proHouseMemberList[%s].age' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+                {
+                    field: 'sex',
+                    align: 'center',
+                    title: '性别',
+                    formatter: function(value, row, index) {
+                        var name = $.common.sprintf("proHouseMemberList[%s].sex", index);
+                        return $.common.dictToSelect(sexDatas, value, name);
+                    }
+                },
+                {
+                    field: 'mobile',
+                    align: 'center',
+                    title: '联系方式',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='proHouseMemberList[%s].mobile' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'state',
+                    align: 'center',
+                    title: '状态',
+                    formatter: function(value, row, index) {
+                        var name = $.common.sprintf("proHouseMemberList[%s].state", index);
+                        return $.common.dictToSelect(stateDatas, value, name);
+                    }
+                },
+                {
+                    field: 'note',
+                    align: 'center',
+                    title: '备注',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='proHouseMemberList[%s].note' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+                {
+                    field: 'entranceGuardNum',
+                    align: 'center',
+                    title: '门禁编号',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='proHouseMemberList[%s].entranceGuardNum' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+
+        ]
+    };
+    $.table.init(options);
+    });
+
+    function addColumn() {
+        var count = $("#" + table.options.id).bootstrapTable('getData').length;
+        sub.editColumn();
+
+        $("#" + table.options.id).bootstrapTable('insertRow', {
+            index: count,
+            row: {
+                index: $.table.serialNumber(count),
+                name: "",
+                age: "",
+                sex: "",
+                mobile: "",
+                houseAddressId:  "",
+                creatTime: "",
+                state: "",
+                note: "",
+                entranceGuardNum: "",
+                openId: "",
+            }
+        });
+    }
+    /*房屋管理-新增-选择地址树*/
+    function selectAddressTree() {
+        var treeId = $("#treeId").val();
+        var addressId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+        var url = ctx + "property/houseaddress/selectHouseaddressTree/" + addressId;
+        var options = {
+            title: '选择地址',
+            width: "380",
+            url: url,
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero){
+        var tree = layero.find("iframe")[0].contentWindow.$._tree;
+        if ($.tree.notAllowRoot(tree)) {
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+    }
+</script>
+</body>
+</html>

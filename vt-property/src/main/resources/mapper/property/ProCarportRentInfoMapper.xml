@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProCarportRentInfoMapper">
+
+    <resultMap type="ProCarportRentInfo" id="ProCarportRentInfoResult">
+        <result property="id"    column="id"    />
+        <result property="carportNum"    column="carport_num"    />
+        <result property="houseCarNum"    column="house_car_num"    />
+        <result property="memberName"    column="member_name"    />
+        <result property="houseAddress"    column="house_address"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="state"    column="state"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectProCarportRentInfoVo">
+        select id, carport_num, house_car_num, member_name, house_address, start_time, end_time, total_price, state, create_time from pro_carport_rent_info
+    </sql>
+
+    <select id="selectProCarportRentInfoList" parameterType="ProCarportRentInfo" resultMap="ProCarportRentInfoResult">
+        <include refid="selectProCarportRentInfoVo"/>
+        <where>
+            <if test="carportNum != null and carportNum!='' "> and carport_num = #{carportNum}</if>
+            <if test="houseCarNum != null and houseCarNum!=''"> and house_car_num like concat('%', #{houseCarNum}, '%')</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+        </where>
+    </select>
+
+    <select id="selectProCarportRentInfoById" parameterType="Long" resultMap="ProCarportRentInfoResult">
+        <include refid="selectProCarportRentInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProCarportRentInfo" parameterType="ProCarportRentInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_carport_rent_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carportNum != null">carport_num,</if>
+            <if test="houseCarNum != null">house_car_num,</if>
+            <if test="memberName != null">member_name,</if>
+            <if test="houseAddress != null">house_address,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="totalPrice != null">total_price,</if>
+            <if test="state != null">state,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carportNum != null">#{carportNum},</if>
+            <if test="houseCarNum != null">#{houseCarNum},</if>
+            <if test="memberName != null">#{memberName},</if>
+            <if test="houseAddress != null">#{houseAddress},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="totalPrice != null">#{totalPrice},</if>
+            <if test="state != null">#{state},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProCarportRentInfo" parameterType="ProCarportRentInfo">
+        update pro_carport_rent_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carportNum != null">carport_num = #{carportNum},</if>
+            <if test="houseCarNum != null">house_car_num = #{houseCarNum},</if>
+            <if test="memberName != null">member_name = #{memberName},</if>
+            <if test="houseAddress != null">house_address = #{houseAddress},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProCarportRentInfoById" parameterType="Long">
+        delete from pro_carport_rent_info where id = #{id}
+    </delete>
+
+    <delete id="deleteProCarportRentInfoByIds" parameterType="String">
+        delete from pro_carport_rent_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

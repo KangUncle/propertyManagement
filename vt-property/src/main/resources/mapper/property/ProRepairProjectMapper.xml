@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProRepairProjectMapper">
+
+    <resultMap type="ProRepairProject" id="ProRepairProjectResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="details"    column="details"    />
+    </resultMap>
+
+    <sql id="selectProRepairProjectVo">
+        select id, name, details from pro_repair_project
+    </sql>
+
+    <select id="selectProRepairProjectList" parameterType="ProRepairProject" resultMap="ProRepairProjectResult">
+        <include refid="selectProRepairProjectVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectProRepairProjectById" parameterType="Long" resultMap="ProRepairProjectResult">
+        <include refid="selectProRepairProjectVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProRepairProject" parameterType="ProRepairProject" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_repair_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="details != null">details,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="details != null">#{details},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProRepairProject" parameterType="ProRepairProject">
+        update pro_repair_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="details != null">details = #{details},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProRepairProjectById" parameterType="Long">
+        delete from pro_repair_project where id = #{id}
+    </delete>
+
+    <delete id="deleteProRepairProjectByIds" parameterType="String">
+        delete from pro_repair_project where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

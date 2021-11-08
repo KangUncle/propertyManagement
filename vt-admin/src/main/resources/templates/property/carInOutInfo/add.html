@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增车辆进出详情')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-carInOutInfo-add">
+        <h4 class="h4 form-header">车辆信息</h4>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">车牌号：</label>
+            <div class="col-sm-8">
+                <input name="carNum" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">进入时的照片：</label>
+            <div class="col-sm-8">
+                <input type="hidden" name="intoCarImage">
+                <div class="file-loading">
+                    <input class="form-control file-upload" id="intoCarImage" name="file" type="file">
+                </div>
+            </div>
+        </div>
+        <h4 class="h4 form-header">操作设备</h4>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">设备名称：</label>
+            <div class="col-sm-8">
+                <select name="intoDeviceId" class="form-control m-b">
+                    <option th:each="device : ${deviceList}" th:text="${device.name}" th:value="${device.id}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "property/carInOutInfo"
+    $("#form-carInOutInfo-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/manuallyPutInStorage", $('#form-carInOutInfo-add').serialize());
+        }
+    }
+
+    $(".file-upload").fileinput({
+        uploadUrl: '/common/upload',
+        maxFileCount: 1,
+        autoReplace: true
+    }).on('fileuploaded', function (event, data, previewId, index) {
+        $("input[name='" + event.currentTarget.id + "']").val(data.response.url)
+    }).on('fileremoved', function (event, id, index) {
+        $("input[name='" + event.currentTarget.id + "']").val('')
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProHouseMapper">
+
+    <resultMap type="ProHouse" id="ProHouseResult">
+        <result property="id"    column="id"    />
+        <result property="owerName"    column="ower_name"    />
+        <result property="owerMobile"    column="ower_mobile"    />
+        <result property="houseTypeId"    column="house_type_id"    />
+        <result property="houseAddressId"    column="house_address_id"    />
+        <result property="houseAddressName"    column="house_address_name"    />
+        <result property="buyTime"    column="buy_time"    />
+        <result property="createrTime"    column="creater_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="houseState"    column="house_state"    />
+        <result property="owerImage"    column="ower_image"    />
+        <result property="remark"    column="remark"    />
+        <association property="houseAddress" column="house_address_id" javaType="ProHouseAddress" resultMap="ProHouseAddressResult"/>
+        <association property="houseType" column="house_type_id" javaType="ProHouseType" resultMap="ProHouseTypeResult"/>
+    </resultMap>
+
+    <resultMap id="ProHouseProHouseMemberResult" type="ProHouse" extends="ProHouseResult">
+        <collection property="proHouseMemberList" notNullColumn="id" javaType="java.util.List" resultMap="ProHouseMemberResult" />
+    </resultMap>
+
+    <resultMap type="ProHouseMember" id="ProHouseMemberResult">
+        <result property="id"    column="meb_id"    />
+        <result property="name"    column="name"    />
+        <result property="age"    column="age"    />
+        <result property="sex"    column="sex"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="houseAddressId"    column="house_address_id"    />
+        <result property="creatTime"    column="creat_time"    />
+        <result property="state"    column="state"    />
+        <result property="note"    column="note"    />
+        <result property="entranceGuardNum"    column="entrance_guard_num"    />
+        <result property="openId"    column="open_id"    />
+        <result property="houseId"    column="house_id"    />
+    </resultMap>
+
+    <resultMap id="ProHouseAddressResult" type="ProHouseAddress">
+        <result property="id" column="address_id"/>
+        <result property="name" column="address_name"/>
+        <result property="pid" column="pid"/>
+        <result property="ancestors"    column="ancestors"    />
+        <result property="ancestorsName"    column="ancestors_name"    />
+    </resultMap>
+
+    <resultMap id="ProHouseTypeResult" type="ProHouseType">
+        <result property="id" column="type_id"/>
+        <result property="name" column="type_name"/>
+        <result property="area" column="area"/>
+        <result property="note" column="type_note"/>
+        <result property="unitPrice" column="unit_price"/>
+    </resultMap>
+
+    <sql id="selectProHouseVo">
+        select id, ower_name, ower_mobile, house_type_id, house_address_id, house_address_name, buy_time, creater_time, create_by, update_time, update_by, house_state, ower_image, remark from pro_house
+    </sql>
+
+    <select id="selectProHouseList" parameterType="ProHouse" resultMap="ProHouseResult">
+        select
+        h.*,
+        t.id type_id, t.name type_name,t.area ,t.note type_note,t.unit_price,
+        address.id address_id,address.name address_name,address.pid,address.ancestors,address.ancestors_name
+        from pro_house h
+        left join pro_house_type t on t.id=h.house_type_id
+        left join pro_house_address address on address.id=h.house_address_id
+        <where>
+            <if test="owerName != null  and owerName != ''"> and ower_name like concat('%', #{owerName}, '%')</if>
+            <if test="houseTypeId != null "> and house_type_id=#{houseTypeId}</if>
+             <if test="houseAddressId !=null"> and address.ancestors like concat('%', #{houseAddressId}, '%') or house_type_id=#{houseAddressId}</if>
+            <if test="houseState != null "> and house_state = #{houseState}</if>
+        </where>
+    </select>
+
+    <select id="selectProHouseById" parameterType="Long" resultMap="ProHouseProHouseMemberResult">
+        select a.id, a.ower_name, a.ower_mobile, a.house_type_id, a.house_address_id, a.house_address_name, a.buy_time, a.creater_time, a.create_by, a.update_time, a.update_by, a.house_state, a.ower_image, a.remark,
+            b.id meb_id, b.name, b.age, b.sex, b.mobile, b.house_address_id, b.creat_time, b.state, b.note, b.entrance_guard_num, b.open_id, b.house_id
+        from pro_house a
+        left join pro_house_member b on b.house_id = a.id
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertProHouse" parameterType="ProHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="owerName != null">ower_name,</if>
+            <if test="owerMobile != null">ower_mobile,</if>
+            <if test="houseTypeId != null">house_type_id,</if>
+            <if test="houseAddressId != null">house_address_id,</if>
+            <if test="houseAddressName != null">house_address_name,</if>
+            <if test="buyTime != null">buy_time,</if>
+            <if test="createrTime != null">creater_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="houseState != null">house_state,</if>
+            <if test="owerImage != null">ower_image,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="owerName != null">#{owerName},</if>
+            <if test="owerMobile != null">#{owerMobile},</if>
+            <if test="houseTypeId != null">#{houseTypeId},</if>
+            <if test="houseAddressId != null">#{houseAddressId},</if>
+            <if test="houseAddressName != null">#{houseAddressName},</if>
+            <if test="buyTime != null">#{buyTime},</if>
+            <if test="createrTime != null">#{createrTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="houseState != null">#{houseState},</if>
+            <if test="owerImage != null">#{owerImage},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProHouse" parameterType="ProHouse">
+        update pro_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="owerName != null">ower_name = #{owerName},</if>
+            <if test="owerMobile != null">ower_mobile = #{owerMobile},</if>
+            <if test="houseTypeId != null">house_type_id = #{houseTypeId},</if>
+            <if test="houseAddressId != null">house_address_id = #{houseAddressId},</if>
+            <if test="houseAddressName != null">house_address_name = #{houseAddressName},</if>
+            <if test="buyTime != null">buy_time = #{buyTime},</if>
+            <if test="createrTime != null">creater_time = #{createrTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="houseState != null">house_state = #{houseState},</if>
+            <if test="owerImage != null">ower_image = #{owerImage},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProHouseById" parameterType="Long">
+        delete from pro_house where id = #{id}
+    </delete>
+
+    <delete id="deleteProHouseByIds" parameterType="String">
+        delete from pro_house where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteProHouseMemberByHouseIds" parameterType="String">
+        delete from pro_house_member where house_id in
+        <foreach item="houseId" collection="array" open="(" separator="," close=")">
+            #{houseId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteProHouseMemberByHouseId" parameterType="Long">
+        delete from pro_house_member where house_id = #{houseId}
+    </delete>
+
+    <insert id="batchProHouseMember">
+        insert into pro_house_member( id, name, age, sex, mobile, house_address_id, creat_time, state, note, entrance_guard_num, open_id, house_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.name}, #{item.age}, #{item.sex}, #{item.mobile}, #{item.houseAddressId}, #{item.creatTime}, #{item.state}, #{item.note}, #{item.entranceGuardNum}, #{item.openId}, #{item.houseId})
+        </foreach>
+    </insert>
+    <select id="conditionsTheQuery" parameterType="ProHouse" resultMap="ProHouseResult" >
+        <include refid="selectProHouseVo"/>
+        <where>
+        1=1
+            <if test="id!=null">and id=#{id} </if>
+            <if test="houseAddressId!=null"> and house_address_id=#{houseAddressId}</if>
+        </where>
+    </select>
+
+</mapper>

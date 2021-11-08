@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProStopCarOrderMapper">
+
+    <resultMap type="ProStopCarOrder" id="ProStopCarOrderResult">
+        <result property="id"    column="id"    />
+        <result property="carInOutInfoId"    column="car_in_out_info_id"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="orderState"    column="order_state"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="realPayTime"    column="real_pay_time"    />
+    </resultMap>
+
+    <sql id="selectProStopCarOrderVo">
+        select id, car_in_out_info_id, total_price, order_state, create_time, real_pay_time from pro_stop_car_order
+    </sql>
+
+    <select id="selectProStopCarOrderList" parameterType="ProStopCarOrder" resultMap="ProStopCarOrderResult">
+        <include refid="selectProStopCarOrderVo"/>
+        <where>
+            <if test="carInOutInfoId != null "> and car_in_out_info_id = #{carInOutInfoId}</if>
+            <if test="orderState != null "> and order_state = #{orderState}</if>
+        </where>
+    </select>
+
+    <select id="selectProStopCarOrderById" parameterType="Long" resultMap="ProStopCarOrderResult">
+        <include refid="selectProStopCarOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProStopCarOrder" parameterType="ProStopCarOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_stop_car_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carInOutInfoId != null">car_in_out_info_id,</if>
+            <if test="totalPrice != null">total_price,</if>
+            <if test="orderState != null">order_state,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="realPayTime != null">real_pay_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carInOutInfoId != null">#{carInOutInfoId},</if>
+            <if test="totalPrice != null">#{totalPrice},</if>
+            <if test="orderState != null">#{orderState},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="realPayTime != null">#{realPayTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProStopCarOrder" parameterType="ProStopCarOrder">
+        update pro_stop_car_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carInOutInfoId != null">car_in_out_info_id = #{carInOutInfoId},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="orderState != null">order_state = #{orderState},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="realPayTime != null">real_pay_time = #{realPayTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProStopCarOrderById" parameterType="Long">
+        delete from pro_stop_car_order where id = #{id}
+    </delete>
+
+    <delete id="deleteProStopCarOrderByIds" parameterType="String">
+        delete from pro_stop_car_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

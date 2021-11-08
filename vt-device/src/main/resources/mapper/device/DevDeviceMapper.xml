@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.device.mapper.DevDeviceMapper">
+
+    <resultMap type="DevDevice" id="DevDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="mac"    column="mac"    />
+        <result property="name"    column="name"    />
+        <result property="position"    column="position"    />
+        <result property="keepTime"    column="keep_time"    />
+        <result property="type"    column="type"    />
+        <result property="state"    column="state"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectDevDeviceVo">
+        select id, mac, name, position, keep_time, type, state, create_by, create_time, update_by, update_time from dev_device
+    </sql>
+
+    <select id="selectDevDeviceList" parameterType="DevDevice" resultMap="DevDeviceResult">
+        <include refid="selectDevDeviceVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="state != null "> and state = #{state}</if>
+        </where>
+    </select>
+
+    <select id="selectDevDeviceById" parameterType="Long" resultMap="DevDeviceResult">
+        <include refid="selectDevDeviceVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDevDevice" parameterType="DevDevice">
+        insert into dev_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="mac != null">mac,</if>
+            <if test="name != null">name,</if>
+            <if test="position != null">position,</if>
+            <if test="keepTime != null">keep_time,</if>
+            <if test="type != null">type,</if>
+            <if test="state != null">state,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="mac != null">#{mac},</if>
+            <if test="name != null">#{name},</if>
+            <if test="position != null">#{position},</if>
+            <if test="keepTime != null">#{keepTime},</if>
+            <if test="type != null">#{type},</if>
+            <if test="state != null">#{state},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDevDevice" parameterType="DevDevice">
+        update dev_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mac != null">mac = #{mac},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="keepTime != null">keep_time = #{keepTime},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDevDeviceById" parameterType="Long">
+        delete from dev_device where id = #{id}
+    </delete>
+
+    <delete id="deleteDevDeviceByIds" parameterType="String">
+        delete from dev_device where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

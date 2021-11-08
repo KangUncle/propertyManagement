@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProHouseAddressMapper">
+
+    <resultMap type="ProHouseAddress" id="ProHouseAddressResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="pid"    column="pid"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="ancestorsName"    column="ancestors_name"    />
+        <result property="parentName" column="parent_name" />
+    </resultMap>
+
+    <sql id="selectProHouseAddressVo">
+        select id, name, pid, ancestors, ancestors_name from pro_house_address
+    </sql>
+
+    <select id="selectProHouseAddressList" parameterType="ProHouseAddress" resultMap="ProHouseAddressResult">
+        <include refid="selectProHouseAddressVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="pid != null">and pid=#{pid}</if>
+            <if test="ancestorsName != null  and ancestorsName != ''"> and ancestors_name like concat('%', #{ancestorsName}, '%')</if>
+        </where>
+        order by pid
+    </select>
+
+    <select id="selectProHouseAddressById" parameterType="Long" resultMap="ProHouseAddressResult">
+        select t.id, t.name, t.pid, t.ancestors, t.ancestors_name, p.name as parent_name
+        from pro_house_address t
+        left join pro_house_address p on p.id = t.pid
+        where t.id = #{id}
+    </select>
+
+    <insert id="insertProHouseAddress" parameterType="ProHouseAddress" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_house_address
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="pid != null">pid,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="ancestorsName != null">ancestors_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="pid != null">#{pid},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="ancestorsName != null">#{ancestorsName},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProHouseAddress" parameterType="ProHouseAddress">
+        update pro_house_address
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="pid != null">pid = #{pid},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="ancestorsName != null">ancestors_name = #{ancestorsName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProHouseAddressById" parameterType="Long">
+        delete from pro_house_address where id = #{id}
+    </delete>
+
+    <delete id="deleteProHouseAddressByIds" parameterType="String">
+        delete from pro_house_address where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectProHouseAddressListById" parameterType="ProHouseAddress" resultMap="ProHouseAddressResult">
+        <include refid="selectProHouseAddressVo"/>
+        <where>
+            <if test="ancestors != null  and ancestors != ''"> and ancestors_name like concat('%', #{houseAddressId}, '%')</if>
+        </where>
+        order by pid
+    </select>
+
+</mapper>

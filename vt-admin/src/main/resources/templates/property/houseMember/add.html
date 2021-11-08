@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增家庭成员')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-houseMember-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">成员姓名：</label>
+            <div class="col-sm-8">
+                <input name="name" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">年龄：</label>
+            <div class="col-sm-8">
+                <input name="age" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">性别：</label>
+            <div class="col-sm-8">
+                <select name="sex" class="form-control m-b" th:with="type=${@dict.getType('sys_user_sex')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">联系方式：</label>
+            <div class="col-sm-8">
+                <input name="mobile" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">家庭地址：</label>
+            <div class="col-sm-8">
+                <select name="houseAddressId" class="form-control m-b">
+                    <option value="">所有</option>
+                </select>
+                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">创建时间：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="creatTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <select name="state" class="form-control m-b" th:with="type=${@dict.getType('pro_member_state')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注：</label>
+            <div class="col-sm-8">
+                <input name="note" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">门禁编号：</label>
+            <div class="col-sm-8">
+                <input name="entranceGuardNum" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">微信的openid：</label>
+            <div class="col-sm-8">
+                <input name="openId" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">家庭：</label>
+            <div class="col-sm-8">
+                <select name="houseId" class="form-control m-b">
+                    <option value="">所有</option>
+                </select>
+                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<script th:inline="javascript">
+    var prefix = ctx + "property/houseMember"
+    $("#form-houseMember-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-houseMember-add').serialize());
+        }
+    }
+
+    $("input[name='creatTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+</script>
+</body>
+</html>

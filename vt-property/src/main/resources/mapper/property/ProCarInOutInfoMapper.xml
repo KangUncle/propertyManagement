@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProCarInOutInfoMapper">
+
+    <resultMap type="ProCarInOutInfo" id="ProCarInOutInfoResult">
+        <result property="id"    column="id"    />
+        <result property="carNum"    column="car_num"    />
+        <result property="intoTime"    column="into_time"    />
+        <result property="outTime"    column="out_time"    />
+        <result property="intoDeviceId"    column="into_device_id"    />
+        <result property="outDeviceId"    column="out_device_id"    />
+        <result property="intoCarImage"    column="into_car_image"    />
+        <result property="outCarImage"    column="out_car_image"    />
+        <result property="carAttributeId"    column="car_attribute_id"    />
+    </resultMap>
+    <sql id="selectProCarInOutInfoVo">
+        select id, car_num, into_time, out_time, into_device_id, out_device_id, into_car_image, out_car_image, car_attribute_id from pro_car_in_out_info
+    </sql>
+
+    <select id="selectProCarInOutInfoList" parameterType="ProCarInOutInfo" resultMap="ProCarInOutInfoResult">
+        <include refid="selectProCarInOutInfoVo"/>
+        <where>
+            <if test="carNum != null  and carNum != ''"> and car_num = #{carNum}</if>
+             <if test="params.beginIntoTime !=null and params.beginIntoTime !=''">
+                 and date_format(into_time,'%y%m%d') &gt;= date_format(#{params.beginIntoTime},'%y%m%d')
+             </if>
+            <if test="params.endIntoTime !=null and params.endIntoTime !=''">
+                and date_format(into_time,'%y%m%d') &lt;= date_format(#{params.endIntoTime},'%y%m%d')
+            </if>
+            <if test="carAttributeId != null "> and car_attribute_id = #{carAttributeId}</if>
+        </where>
+    </select>
+
+    <select id="selectProCarInOutInfoById" parameterType="Long" resultMap="ProCarInOutInfoResult">
+        <include refid="selectProCarInOutInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProCarInOutInfo" parameterType="ProCarInOutInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_car_in_out_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carNum != null">car_num,</if>
+            <if test="intoTime != null">into_time,</if>
+            <if test="outTime != null">out_time,</if>
+            <if test="intoDeviceId != null">into_device_id,</if>
+            <if test="outDeviceId != null">out_device_id,</if>
+            <if test="intoCarImage != null">into_car_image,</if>
+            <if test="outCarImage != null">out_car_image,</if>
+            <if test="carAttributeId != null">car_attribute_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carNum != null">#{carNum},</if>
+            <if test="intoTime != null">#{intoTime},</if>
+            <if test="outTime != null">#{outTime},</if>
+            <if test="intoDeviceId != null">#{intoDeviceId},</if>
+            <if test="outDeviceId != null">#{outDeviceId},</if>
+            <if test="intoCarImage != null">#{intoCarImage},</if>
+            <if test="outCarImage != null">#{outCarImage},</if>
+            <if test="carAttributeId != null">#{carAttributeId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProCarInOutInfo" parameterType="ProCarInOutInfo">
+        update pro_car_in_out_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carNum != null">car_num = #{carNum},</if>
+            <if test="intoTime != null">into_time = #{intoTime},</if>
+            <if test="outTime != null">out_time = #{outTime},</if>
+            <if test="intoDeviceId != null">into_device_id = #{intoDeviceId},</if>
+            <if test="outDeviceId != null">out_device_id = #{outDeviceId},</if>
+            <if test="intoCarImage != null">into_car_image = #{intoCarImage},</if>
+            <if test="outCarImage != null">out_car_image = #{outCarImage},</if>
+            <if test="carAttributeId != null">car_attribute_id = #{carAttributeId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProCarInOutInfoById" parameterType="Long">
+        delete from pro_car_in_out_info where id = #{id}
+    </delete>
+
+    <delete id="deleteProCarInOutInfoByIds" parameterType="String">
+        delete from pro_car_in_out_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getOutboundCarByCarNum" parameterType="String" resultMap="ProCarInOutInfoResult">
+        <include refid="selectProCarInOutInfoVo"/>
+        <where>
+            car_num=#{car_num}
+            and out_device_id=null
+            and out_car_image=null
+            and out_time=null
+        </where>
+    </select>
+
+</mapper>

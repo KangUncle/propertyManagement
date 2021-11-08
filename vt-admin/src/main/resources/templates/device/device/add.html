@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增设备信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-device-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">mac：</label>
+            <div class="col-sm-8">
+                <input name="mac" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">设备名称：</label>
+            <div class="col-sm-8">
+                <input name="name" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">安装位置：</label>
+            <div class="col-sm-8">
+                <input name="position" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">开门时长(秒)：</label>
+            <div class="col-sm-8">
+                <input name="keepTime" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">设备类型：</label>
+            <div class="col-sm-8">
+                <select name="type" class="form-control m-b" th:with="type=${@dict.getType('device_type')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态</label>
+            <div class="col-sm-8">
+                <select name="state" class="form-control m-b" th:with="type=${@dict.getType('device_state')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<script th:inline="javascript">
+    var prefix = ctx + "device/device"
+    $("#form-device-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-device-add').serialize());
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProStopCarAttributeMapper">
+
+    <resultMap type="ProStopCarAttribute" id="ProStopCarAttributeResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="basisPrice"    column="basis_price"    />
+        <result property="timOutPrice"    column="tim_out_price"    />
+        <result property="freeTime"    column="free_time"    />
+        <result property="note"    column="note"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="creater"    column="creater"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updator"    column="updator"    />
+    </resultMap>
+
+    <sql id="selectProStopCarAttributeVo">
+        select id, title, basis_price, tim_out_price, free_time, note, create_time, creater, update_time, updator from pro_stop_car_attribute
+    </sql>
+
+    <select id="selectProStopCarAttributeList" parameterType="ProStopCarAttribute" resultMap="ProStopCarAttributeResult">
+        <include refid="selectProStopCarAttributeVo"/>
+        <where>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="basisPrice != null "> and basis_price >= #{basisPrice}</if>
+            <if test="updator != null  and updator != ''"> and updator = #{updator}</if>
+        </where>
+    </select>
+
+    <select id="selectProStopCarAttributeById" parameterType="Long" resultMap="ProStopCarAttributeResult">
+        <include refid="selectProStopCarAttributeVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProStopCarAttribute" parameterType="ProStopCarAttribute" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_stop_car_attribute
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="basisPrice != null">basis_price,</if>
+            <if test="timOutPrice != null">tim_out_price,</if>
+            <if test="freeTime != null">free_time,</if>
+            <if test="note != null">note,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="creater != null">creater,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updator != null">updator,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="basisPrice != null">#{basisPrice},</if>
+            <if test="timOutPrice != null">#{timOutPrice},</if>
+            <if test="freeTime != null">#{freeTime},</if>
+            <if test="note != null">#{note},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="creater != null">#{creater},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updator != null">#{updator},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProStopCarAttribute" parameterType="ProStopCarAttribute">
+        update pro_stop_car_attribute
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="basisPrice != null">basis_price = #{basisPrice},</if>
+            <if test="timOutPrice != null">tim_out_price = #{timOutPrice},</if>
+            <if test="freeTime != null">free_time = #{freeTime},</if>
+            <if test="note != null">note = #{note},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="creater != null">creater = #{creater},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updator != null">updator = #{updator},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProStopCarAttributeById" parameterType="Long">
+        delete from pro_stop_car_attribute where id = #{id}
+    </delete>
+
+    <delete id="deleteProStopCarAttributeByIds" parameterType="String">
+        delete from pro_stop_car_attribute where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

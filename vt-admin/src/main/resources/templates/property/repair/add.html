@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增维修')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-repair-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">报修人姓名：</label>
+            <div class="col-sm-8">
+                <input name="repairManName" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">报修人电话：</label>
+            <div class="col-sm-8">
+                <input name="repairManPhone" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">报修地址：</label>
+            <div class="col-sm-8">
+                <input onclick="selectAddressTree()" id="treeName" type="text" placeholder="请选择归属地址" class="form-control" required>
+                <input name="repairAddress" id="treeId" type="hidden" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">详细地址：</label>
+            <div class="col-sm-8">
+                <textarea name="repairArea" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">报修项目：</label>
+            <div class="col-sm-8">
+                <select name="repairProject" class="form-control m-b" required>
+                    <option th:each="project:${projectList}" th:value="${project.id}" th:text="${project.name}">所有</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">具体内容：</label>
+            <div class="col-sm-8">
+                <textarea name="repairContent" class="form-control" required></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">报修照片：</label>
+            <div class="col-sm-8">
+                <input type="hidden" name="repairImage">
+                <div class="file-loading">
+                    <input class="form-control file-upload" id="repairImage" name="file" type="file">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "property/repair"
+    $("#form-repair-add").validate({
+        focusCleanup: true
+    });
+    $(".file-upload").fileinput({
+        uploadUrl: '/common/upload',
+        maxFileCount: 1,
+        autoReplace: true
+    }).on('fileuploaded', function (event, data, previewId, index) {
+        $("input[name='" + event.currentTarget.id + "']").val(data.response.url)
+    }).on('fileremoved', function (event, id, index) {
+        $("input[name='" + event.currentTarget.id + "']").val('')
+    })
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-repair-add').serialize());
+        }
+    }
+
+    $("input[name='dealTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+    $("input[name='serviceTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+
+    /*维修管理-新增-选择地址树*/
+    function selectAddressTree() {
+        var treeId = $("#treeId").val();
+        var addressId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+        var url = ctx + "property/houseaddress/selectHouseaddressTree/" + addressId;
+        var options = {
+            title: '选择地址',
+            width: "380",
+            url: url,
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero){
+        var tree = layero.find("iframe")[0].contentWindow.$._tree;
+        if ($.tree.notAllowRoot(tree)) {
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+    }
+</script>
+</body>
+</html>>

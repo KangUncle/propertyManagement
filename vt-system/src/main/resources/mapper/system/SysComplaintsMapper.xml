@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.system.mapper.SysComplaintsMapper">
+
+    <resultMap type="SysComplaints" id="SysComplaintsResult">
+        <result property="id"    column="id"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="content"    column="content"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="dealMan"    column="deal_man"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="dealContent"    column="deal_content"    />
+        <result property="remark"    column="remark"    />
+        <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id     property="deptId"   column="dept_id"     />
+        <result property="parentId" column="parent_id"   />
+        <result property="deptName" column="dept_name"   />
+        <result property="orderNum" column="order_num"   />
+        <result property="leader"   column="leader"      />
+        <result property="status"   column="dept_status" />
+    </resultMap>
+
+    <sql id="selectSysComplaintsVo">
+        select c.* ,d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
+        from sys_complaints c
+        left join sys_dept d on c.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectSysComplaintsList" parameterType="SysComplaints" resultMap="SysComplaintsResult">
+        <include refid="selectSysComplaintsVo"/>
+        <where>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="dealMan != null  and dealMan != ''"> and deal_man = #{dealMan}</if>
+        </where>
+    </select>
+
+    <select id="selectSysComplaintsById" parameterType="Long" resultMap="SysComplaintsResult">
+        <include refid="selectSysComplaintsVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysComplaints" parameterType="SysComplaints" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_complaints
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="dealMan != null">deal_man,</if>
+            <if test="dealTime != null">deal_time,</if>
+            <if test="dealContent != null and dealContent != ''">deal_content,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="dealMan != null">#{dealMan},</if>
+            <if test="dealTime != null">#{dealTime},</if>
+            <if test="dealContent != null and dealContent != ''">#{dealContent},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysComplaints" parameterType="SysComplaints">
+        update sys_complaints
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="dealMan != null">deal_man = #{dealMan},</if>
+            <if test="dealTime != null">deal_time = #{dealTime},</if>
+            <if test="dealContent != null and dealContent != ''">deal_content = #{dealContent},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysComplaintsById" parameterType="Long">
+        delete from sys_complaints where id = #{id}
+    </delete>
+
+    <delete id="deleteSysComplaintsByIds" parameterType="String">
+        delete from sys_complaints where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

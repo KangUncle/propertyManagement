@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProHouseTypeMapper">
+
+    <resultMap type="ProHouseType" id="ProHouseTypeResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="area"    column="area"    />
+        <result property="note"    column="note"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="unitPrice"    column="unit_price"    />
+    </resultMap>
+
+    <sql id="selectProHouseTypeVo">
+        select id, name, area, note, create_time, unit_price from pro_house_type
+    </sql>
+
+    <select id="selectProHouseTypeList" parameterType="ProHouseType" resultMap="ProHouseTypeResult">
+        <include refid="selectProHouseTypeVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="area != null "> and area = #{area}</if>
+            <if test="note != null  and note != ''"> and note = #{note}</if>
+            <if test="unitPrice != null "> and unit_price = #{unitPrice}</if>
+        </where>
+    </select>
+
+    <select id="selectProHouseTypeById" parameterType="Long" resultMap="ProHouseTypeResult">
+        <include refid="selectProHouseTypeVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProHouseType" parameterType="ProHouseType" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_house_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="area != null">area,</if>
+            <if test="note != null">note,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="unitPrice != null">unit_price,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="area != null">#{area},</if>
+            <if test="note != null">#{note},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProHouseType" parameterType="ProHouseType">
+        update pro_house_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="note != null">note = #{note},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProHouseTypeById" parameterType="Long">
+        delete from pro_house_type where id = #{id}
+    </delete>
+
+    <delete id="deleteProHouseTypeByIds" parameterType="String">
+        delete from pro_house_type where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

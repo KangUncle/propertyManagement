@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snk.property.mapper.ProRepairMapper">
+
+    <resultMap type="ProRepair" id="ProRepairResult">
+        <result property="id"    column="id"    />
+        <result property="repairManName"    column="repair_man_name"    />
+        <result property="repairContent"    column="repair_content"    />
+        <result property="repairProject"    column="repair_project"    />
+        <result property="repairArea"    column="repair_area"    />
+        <result property="repairAddress"    column="repair_address"    />
+        <result property="repairManPhone"    column="repair_man_phone"    />
+        <result property="repairImage"    column="repair_image"    />
+        <result property="serviceManId"    column="service_man_id"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="dealMan"    column="deal_man"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="serviceTime"    column="service_time"    />
+        <result property="repairState"    column="repair_state"    />
+        <result property="credentialImg" column="credential_img"/>
+    </resultMap>
+
+    <sql id="selectProRepairVo">
+        select id, repair_man_name, repair_content, repair_project, repair_area, repair_address, repair_man_phone, repair_image, service_man_id, member_id, deal_man, create_time, deal_time, service_time, repair_state,credential_img from pro_repair
+    </sql>
+
+    <select id="selectProRepairList" parameterType="ProRepair" resultMap="ProRepairResult">
+        <include refid="selectProRepairVo"/>
+        <where>
+            <if test="repairManName != null  and repairManName != ''"> and repair_man_name like concat('%', #{repairManName}, '%')</if>
+            <if test="repairProject != null  and repairProject != ''"> and repair_project = #{repairProject}</if>
+            <if test="serviceManId != null "> and service_man_id = #{serviceManId}</if>
+            <if test="repairState != null "> and repair_state = #{repairState}</if>
+        </where>
+    </select>
+
+    <select id="selectProRepairById" parameterType="Long" resultMap="ProRepairResult">
+        <include refid="selectProRepairVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProRepair" parameterType="ProRepair" useGeneratedKeys="true" keyProperty="id">
+        insert into pro_repair
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="repairManName != null and repairManName != ''">repair_man_name,</if>
+            <if test="repairContent != null and repairContent != ''">repair_content,</if>
+            <if test="repairProject != null and repairProject != ''">repair_project,</if>
+            <if test="repairArea != null">repair_area,</if>
+            <if test="repairAddress != null and repairAddress != ''">repair_address,</if>
+            <if test="repairManPhone != null and repairManPhone != ''">repair_man_phone,</if>
+            <if test="repairImage != null">repair_image,</if>
+            <if test="serviceManId != null">service_man_id,</if>
+            <if test="memberId != null">member_id,</if>
+            <if test="dealMan != null and dealMan!=''">deal_man,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="dealTime != null">deal_time,</if>
+            <if test="serviceTime != null">service_time,</if>
+            <if test="repairState != null">repair_state,</if>
+            <if test="credentialImg != null and credentialImg !=''">credential_img,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="repairManName != null and repairManName != ''">#{repairManName},</if>
+            <if test="repairContent != null and repairContent != ''">#{repairContent},</if>
+            <if test="repairProject != null and repairProject != ''">#{repairProject},</if>
+            <if test="repairArea != null">#{repairArea},</if>
+            <if test="repairAddress != null and repairAddress != ''">#{repairAddress},</if>
+            <if test="repairManPhone != null and repairManPhone != ''">#{repairManPhone},</if>
+            <if test="repairImage != null">#{repairImage},</if>
+            <if test="serviceManId != null">#{serviceManId},</if>
+            <if test="memberId != null">#{memberId},</if>
+            <if test="dealMan != null and dealMan!=''">#{dealMan},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="dealTime != null">#{dealTime},</if>
+            <if test="serviceTime != null">#{serviceTime},</if>
+            <if test="repairState != null">#{repairState},</if>
+            <if test="credentialImg != null and credentialImg !=''">#{credentialImg},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProRepair" parameterType="ProRepair">
+        update pro_repair
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="repairManName != null and repairManName != ''">repair_man_name = #{repairManName},</if>
+            <if test="repairContent != null and repairContent != ''">repair_content = #{repairContent},</if>
+            <if test="repairProject != null and repairProject != ''">repair_project = #{repairProject},</if>
+            <if test="repairArea != null">repair_area = #{repairArea},</if>
+            <if test="repairAddress != null and repairAddress != ''">repair_address = #{repairAddress},</if>
+            <if test="repairManPhone != null and repairManPhone != ''">repair_man_phone = #{repairManPhone},</if>
+            <if test="repairImage != null">repair_image = #{repairImage},</if>
+            <if test="serviceManId != null">service_man_id = #{serviceManId},</if>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="dealMan != null and dealMan!=''">deal_man = #{dealMan},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="dealTime != null">deal_time = #{dealTime},</if>
+            <if test="serviceTime != null">service_time = #{serviceTime},</if>
+            <if test="repairState != null">repair_state = #{repairState},</if>
+            <if test="credentialImg != null and credentialImg !='' " >credential_img = #{credentialImg},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProRepairById" parameterType="Long">
+        delete from pro_repair where id = #{id}
+    </delete>
+
+    <delete id="deleteProRepairByIds" parameterType="String">
+        delete from pro_repair where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
